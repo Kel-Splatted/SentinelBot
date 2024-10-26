@@ -1,0 +1,208 @@
+// Created by Sam Halperin in 2023-2024
+// Assistment provided by Judah Mathai in 2023-2024
+
+//https://ftc-tricks.com/dc-motors/ it is a good source
+// https://githubTensorFlowAuto.java#L60
+// this is the only source you need:
+// https://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+package org.firstinspires.ftc.teamcode;
+//import TurnMotor.init;
+import java.util.Calendar;
+import java.util.Vector;
+import java.util.Date;
+import java.time.ZonedDateTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Servo;
+//import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+// import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+// import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import java.util.Dictionary;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import com.qualcomm.robotcore.hardware.ServoController;
+import com.qualcomm.robotcore.hardware.Blinker;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+@TeleOp
+public class JoyStickDrive extends LinearOpMode {
+
+  private ServoController ControlHub_ServoController;
+  private Blinker control_Hub;
+  private DcMotor BottomLeftDrive;
+  private DcMotor BottomRightDrive;
+  private DcMotor Arm;
+  float SLOWIFY = 0.25f;
+  float forward;
+  float backward;
+  float movement;
+  
+  float movement_x;
+  float movement_y;
+  
+  float motorHorizPower;
+  float side;
+  float backleft = 0;
+  float backright = 0;
+  float vertical;
+  float turn;
+  boolean open = false;
+  short slowon = 0;
+  double wristpos = 0.9;
+  String value;
+  float result = 0;
+  private Servo wrist;
+  private Servo claw;
+  long millis = System.currentTimeMillis();
+  long difference;
+  
+  /**
+   * This function is executed when this Op Mode is selected from the Driver Station.
+   */
+  
+  
+  
+  // public void turnmotor(int num, float speed)
+  // {
+  //   if(speed > 0.9){
+  //     result = 1;
+  //   }
+  //   if(speed < -0.9){
+  //     result = -1;
+  //   }
+  //   if(-0.9 < speed && speed  < 0.9){
+  //     result = speed;
+  //   }
+  //   if (-0.1 < speed && speed < 0.1){
+  //     result = 0;
+  //   }
+    
+  //   if (num == 0){
+  //     BottomLeftDrive.setPower(result);
+  //   }
+  //   if (num == 1){
+  //     BottomRightDrive.setPower(result);
+  //   }
+  // }
+  
+  @Override
+  public void runOpMode() {
+    control_Hub = hardwareMap.get(Blinker.class, "Control Hub");
+    
+    BottomLeftDrive = hardwareMap.get(DcMotor.class, "Backleft"); //0
+    BottomRightDrive = hardwareMap.get(DcMotor.class, "Backright");//1
+    TurnMotor drivefcn = new TurnMotor(BottomLeftDrive, BottomRightDrive);
+    
+    Arm = hardwareMap.get(DcMotor.class, "Arm");//1
+    
+    wrist = hardwareMap.get(Servo.class, "Wrist");
+    claw = hardwareMap.get(Servo.class, "Claw");
+    
+    // BottomLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+    // BottomRightDrive.setDirection(DcMotor.Direction.FORWARD);
+    //initturnmotor(BottomLeftDrive, BottomRightDrive);
+    
+    
+    
+    waitForStart();
+    if (opModeIsActive()) {
+      while (opModeIsActive()) {
+        difference = millis-System.currentTimeMillis();
+        millis = (System.currentTimeMillis());
+        backleft = 0;
+        backright = 0;
+        vertical = 0;
+        
+        
+        double speedarm = gamepad1.right_trigger-gamepad1.left_trigger;
+        
+        if (gamepad1.dpad_right){
+          open = true;
+        }else if (gamepad1.dpad_left){
+          open = false;
+        }
+        if (gamepad1.dpad_up && wristpos< 1.0){
+          wristpos=wristpos+0.001;
+        }
+        if (gamepad1.dpad_down&& wristpos> 0){
+          wristpos=wristpos-0.001;
+        }
+        if (gamepad1.a){
+          open = true;
+          wristpos = 0.605;
+        }
+        if (gamepad1.y){
+          if (slowon == 0){
+            slowon = 1;
+          }
+          if (slowon == 2){
+            slowon = 3;
+          }
+        }else{
+          if (slowon == 1){
+            slowon = 2;
+          }
+          if (slowon == 3){
+            slowon = 0;
+          }
+        }
+        
+        //geting all the data
+        turn = gamepad1.left_stick_x;
+        vertical = -gamepad1.left_stick_y;
+        
+        
+        // Mecanum Thingy for motion.
+        movement_x = gamepad1.left_stick.x;
+        movement_y = gamepad1.left_stick.y;
+        
+        float sin = Math.sin(theta - 3.14159265358979/ 4);
+        float sin = Math.sin(theta - 3.14159265358979/ 4);
+        float max = Math.abs(sin);
+        Math.abs(cos);
+        
+        float FrontLeftMotion = 1 * cos/max + 1;
+        float FrontRightMotion = 1 * sin/max + 1;
+        float BackLeftMotion = 1 * sin/max + 1;
+        float BackRightMotion = 1 * cos/max + 1;
+        
+        if((1+Math.abs(1))>1){
+          FrontLeftMotion/=1+Math.abs(1);
+          FrontRightMotion/=1+Math.abs(1);
+          BackLeftMotion/=1+Math.abs(1);
+          BackRightMotion/=1+Math.abs(1);
+        }
+        
+        //math 
+        backleft = vertical+turn;
+        backright =vertical-turn;
+        drivefcn.drive(backleft, backright);
+        
+        if (!(-0.4>speedarm && speedarm>0.4)){
+          int multiplier;
+          if (slowon == 1 || slowon == 2)speedarm = speedarm*SLOWIFY;
+          Arm.setPower(speedarm);
+          
+        }
+        ////holds arm in place
+        // else{
+        //   Arm.setTargetPosition(0);
+        // }
+        if (open){
+          claw.setPosition(drivefcn.OPEN);
+        }else {
+          claw.setPosition(drivefcn.CLOSED);
+        }
+        wrist.setPosition(wristpos);
+        telemetry.addLine(String.valueOf(wristpos));
+        telemetry.update();
+      }
+    }
+  }
+}
