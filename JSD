@@ -14,6 +14,7 @@ import java.util.Date;
 import java.time.ZonedDateTime;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.Gamepad;
 //import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 // import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -37,7 +38,6 @@ public class JoyStickDrive extends LinearOpMode {
   private Blinker control_Hub;
   private DcMotor BottomLeftDrive;
   private DcMotor BottomRightDrive;
-  private DcMotor Arm;
   float SLOWIFY = 0.25f;
   float forward;
   float backward;
@@ -99,10 +99,10 @@ public class JoyStickDrive extends LinearOpMode {
     BottomRightDrive = hardwareMap.get(DcMotor.class, "Backright");//1
     TurnMotor drivefcn = new TurnMotor(BottomLeftDrive, BottomRightDrive);
     
-    Arm = hardwareMap.get(DcMotor.class, "Arm");//1
+    //Arm = hardwareMap.get(DcMotor.class, "Arm");//1
     
-    wrist = hardwareMap.get(Servo.class, "Wrist");
-    claw = hardwareMap.get(Servo.class, "Claw");
+    //wrist = hardwareMap.get(Servo.class, "Wrist");
+    //claw = hardwareMap.get(Servo.class, "Claw");
     
     // BottomLeftDrive.setDirection(DcMotor.Direction.REVERSE);
     // BottomRightDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -159,11 +159,14 @@ public class JoyStickDrive extends LinearOpMode {
         
         
         // Mecanum Thingy for motion.
-        movement_x = gamepad1.left_stick.x;
-        movement_y = gamepad1.left_stick.y;
+        //movement_x = gamepad1.left_stick.x;
+        movement_x = (float) gamepad1.left_stick_x;
+        movement_y = (float) gamepad1.left_stick_y;
         
-        float sin = Math.sin(theta - 3.14159265358979/ 4);
-        float sin = Math.sin(theta - 3.14159265358979/ 4);
+        float theta = Math.tan(movement_y/movement_x);
+        
+        float sin = Math.sin(theta - 3.1416f/ 4f);
+        float cos = Math.cos(theta - 3.1416f/ 4f);
         float max = Math.abs(sin);
         Math.abs(cos);
         
@@ -184,16 +187,19 @@ public class JoyStickDrive extends LinearOpMode {
         backright =vertical-turn;
         drivefcn.drive(backleft, backright);
         
-        if (!(-0.4>speedarm && speedarm>0.4)){
+        /* (!(-0.4>speedarm && speedarm>0.4)){
           int multiplier;
           if (slowon == 1 || slowon == 2)speedarm = speedarm*SLOWIFY;
           Arm.setPower(speedarm);
-          
         }
+        */
+          
+        
         ////holds arm in place
         // else{
         //   Arm.setTargetPosition(0);
         // }
+        /*
         if (open){
           claw.setPosition(drivefcn.OPEN);
         }else {
@@ -201,6 +207,7 @@ public class JoyStickDrive extends LinearOpMode {
         }
         wrist.setPosition(wristpos);
         telemetry.addLine(String.valueOf(wristpos));
+        */
         telemetry.update();
       }
     }
